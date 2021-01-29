@@ -1,13 +1,13 @@
+from nltk.stem.lancaster import LancasterStemmer
+import random
+import pickle
+import nltk
+import json
+import tensorflow
+import tflearn
+import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
-import numpy as np
-import tflearn
-import tensorflow
-import json
-import nltk
-import pickle
-import random
-from nltk.stem.lancaster import LancasterStemmer
 stemmer = LancasterStemmer()
 
 
@@ -15,7 +15,7 @@ with open('data/intents.json') as file:
     data = json.load(file)
 
 with open("data/data.pickle", 'rb') as f:
-    words, labels, training, output = pickle.load(f)   
+    words, labels, training, output = pickle.load(f)
 print("Pickle Loaded")
 
 
@@ -29,14 +29,13 @@ model.load("model/model.tflearn")
 print("Model Loaded")
 
 
-
 def bag_of_words(s, words):
-    s_words = [ stemmer.stem(word.lower()) for word in nltk.word_tokenize(s)]
+    s_words = [stemmer.stem(word.lower()) for word in nltk.word_tokenize(s)]
     bag = [0 for _ in range(len(words))]
 
     for s_w in s_words:
         for i, w in enumerate(words):
-            if w== s_w:
+            if w == s_w:
                 bag[i] = 1
     return np.array(bag)
 
@@ -51,7 +50,7 @@ def Chat():
         pred = model.predict([bag_of_words(inp, words)])[0]
         result_index = np.argmax(pred)
         tag = labels[result_index]
-        
+
         if pred[result_index] > 0.7:
             for tg in data['intents']:
                 if tg['tag'] == tag:
@@ -59,5 +58,6 @@ def Chat():
             print(random.choice(response))
         else:
             print("I didn't get that, try again.")
+
 
 Chat()
