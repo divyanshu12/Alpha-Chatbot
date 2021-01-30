@@ -4,7 +4,9 @@ import pickle
 import nltk
 import json
 import tensorflow
-import tflearn
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Dropout
+from keras.optimizers import SGD
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -61,14 +63,18 @@ except:
         print("Pickle Saved")
 
 
-net = tflearn.input_data(shape=[None, len(training[0])])
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, len(output[0]), activation='softmax')
-net = tflearn.regression(net)
-model = tflearn.DNN(net)
 
+model = Sequential()
+model.add(Dense(128, input_shape=(len(training[0]),), activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(len(output[0]), activation='softmax'))
 
-model.fit(training, output, n_epoch=1000, batch_size=8, show_metric=True)
-model.save("model/model.tflearn")
-print("Model Saved")
+sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+
+hist = model.fit(np.array(training), np.array(output), epochs=1000, batch_size=5, verbose=1)
+model.save('model/chatbot_model.h5', hist)
+
+print("model created")
