@@ -641,8 +641,8 @@
             "context": [
                 ""
             ]
-        }
-{
+        },
+        {
             "tag": "hours",
             "patterns": [
                 "What hours are you open?",
