@@ -1,13 +1,13 @@
+from nltk.stem.lancaster import LancasterStemmer
+import random
+import pickle
+import nltk
+import json
+import tensorflow
+import tflearn
+import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
-import numpy as np
-import tflearn
-import tensorflow
-import json
-import nltk
-import pickle
-import random
-from nltk.stem.lancaster import LancasterStemmer
 stemmer = LancasterStemmer()
 
 with open('data/intents.json') as file:
@@ -15,7 +15,7 @@ with open('data/intents.json') as file:
 
 try:
     with open("data/data.pickle", 'rb') as f:
-        words, labels, training, output = pickle.load(f)   
+        words, labels, training, output = pickle.load(f)
     print("Pickle Loaded")
 except:
     words = []
@@ -32,11 +32,9 @@ except:
         if intent['tag'] not in labels:
             labels.append(intent['tag'])
 
-
     words = [stemmer.stem(w.lower()) for w in words if w not in '?']
     words = sorted(list(set(words)))
     labels = sorted(labels)
-
 
     training = []
     output = []
@@ -59,7 +57,7 @@ except:
         output.append(output_row)
 
         with open("data/data.pickle", 'wb') as f:
-            pickle.dump((words, labels, training, output),f)
+            pickle.dump((words, labels, training, output), f)
         print("Pickle Saved")
 
 
@@ -74,6 +72,3 @@ model = tflearn.DNN(net)
 model.fit(training, output, n_epoch=1000, batch_size=8, show_metric=True)
 model.save("model/model.tflearn")
 print("Model Saved")
-
-
-
