@@ -4,7 +4,8 @@ import pickle
 import nltk
 import json
 import tensorflow
-import tflearn
+from keras.models import load_model
+from keras.optimizers import SGD
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -19,14 +20,7 @@ with open("data/data.pickle", 'rb') as f:
 print("Pickle Loaded")
 
 
-net = tflearn.input_data(shape=[None, len(training[0])])
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, len(output[0]), activation='softmax')
-net = tflearn.regression(net)
-model = tflearn.DNN(net)
-model.load("model/model.tflearn")
-print("Model Loaded")
+model = load_model('model/chatbot_model.h5')
 
 
 def bag_of_words(s, words):
@@ -47,7 +41,7 @@ def Chat():
         if inp.lower() == 'quit':
             break
 
-        pred = model.predict([bag_of_words(inp, words)])[0]
+        pred = model.predict(np.array([bag_of_words(inp, words)]))[0]
         result_index = np.argmax(pred)
         tag = labels[result_index]
 
